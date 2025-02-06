@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] string AttractorTag;
     [SerializeField] string ExtraJumpGem;
 
+    Animator anim;
+    bool isFacingRight = true;
+
 
     bool isTouchingGround;
     private float directionX;
@@ -28,6 +31,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = gameObject.GetComponent<Animator>();
     }
 
     void OnMove(InputValue value) 
@@ -41,6 +45,8 @@ public class PlayerController : MonoBehaviour
     {
         if (!canMoveLR) return;
         rb.linearVelocity = new Vector2(directionX * speed, rb.linearVelocity.y);
+        anim.SetBool("isRunning", directionX != 0);
+        
     }
 
     void OnJump() 
@@ -60,19 +66,8 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+        if ((isFacingRight && directionX == -1) || (!isFacingRight && directionX == 1)) { flip(); }
     }
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if(collision.collider.IsTouchingLayers(6))
-    //        isTouchingGround = true;
-    //}
-
-    //private void OnCollisionExit2D(Collision2D collision)
-    //{
-    //    if (collision.collider.IsTouchingLayers(6))
-    //        isTouchingGround = false;
-    //}
 
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -129,4 +124,14 @@ public class PlayerController : MonoBehaviour
         canMoveLR = true;
 
     }
+
+
+    void flip()
+    {
+        Vector3 newLocalScale = transform.localScale;
+        newLocalScale.x *= -1f;
+        gameObject.transform.localScale = newLocalScale;
+        isFacingRight = !isFacingRight;
+    }
+
 }
